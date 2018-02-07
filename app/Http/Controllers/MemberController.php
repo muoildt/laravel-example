@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Member;
 use Auth;
+use App\Http\Requests\members\CreateMemberRequests;
+use Validator;
 class MemberController extends Controller
 {
     /**
@@ -23,9 +25,9 @@ class MemberController extends Controller
     {
         if($request->has('search')){
             $members = Member::search($request->search)
-                ->paginate(6);
+                ->paginate(5);
         }else{
-            $members = Member::paginate(6);
+            $members = Member::paginate(5);
         }
         return view('members.index',compact('members'));
     }
@@ -47,7 +49,7 @@ class MemberController extends Controller
      * @return \Illuminate\Http\Response
      */
      
-    public function store(Request $request)
+    public function store(CreateMemberRequests $request)
     {
         Member::create($request->all());
         return redirect()->route('members.index')->with('success','Member created successfully');
@@ -84,25 +86,38 @@ class MemberController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
-        $colum = $request->colum;
-        $val = $request->val;
-        if ($colum=='first_name') {
-            $member = Member::find($id);
-            $member->first_name = $val;
+        switch ( $request->colum ) {
+            case "first_name":
+                $validator = Validator::make($request->all(), [
+                    'value' => 'required',
+                ]);
+
+                break;
+            case "surname":
+                $validator = Validator::make($request->all(), [
+                    'value' => 'required',
+                ]);
+
+                break;
+            case "email":
+               $validator = Validator::make($request->all(), [
+                    'value' => 'required|email',
+                ]);
+                break;
+            default:
+                break;
+        
         }
-        if ($colum=='surname') {
-            $member = Member::find($id);
-            $member->surname = $val;
-        }
-        if ($colum=='email') {
-            $member = Member::find($id);
-            $member->email = $val;
+        if ($validator->passes()) {
             
+            Member::find($request->id)->update([$request->colum => $request->value]);
+            
+            return response()->json(['success'=>'Update successfully.']);
         }
-        $member->update();
-        echo "Member updated successfully";
+
+        return response()->json(['error'=>$validator->errors()->all()]);
     }
 
     /**
@@ -114,6 +129,6 @@ class MemberController extends Controller
     public function destroy($id)
     {
         Member::find($id)->delete();
-        return redirect()->route('members.index')->with('success','Member delete successfully');;
+        return redirect()->route('members.index')->with('success','Member delete successfully');
     }
 }

@@ -15,7 +15,7 @@ class CheckAdmin
      */
     public function handle($request, Closure $next, $guard = null)
     {       $role = Auth::user()->role;
-            if ($role != 0) {    
+            if ($role != 1) {    
                 return redirect()->route('members.index')->with('success','You do not have permission!');   
             }
             return $next($request);

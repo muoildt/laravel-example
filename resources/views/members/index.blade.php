@@ -1,11 +1,13 @@
 @extends('layouts.app')
 
+@section('header')
+    <title>Laravel 5.5 CRUD Application</title>
 @section('content')
 
 <div class="row" style="margin-top: 20px">
     <div class="col-lg-12 margin-tb">
         <div class="title">
-            <h2 style="text-align: center;">Laravel CRUD</h2>
+            <h2 style="text-align: center;">Laravel Members CRUD</h2>
         </div>
     </div>
 </div>
@@ -26,12 +28,12 @@
             </div>
             <div class="col-md-4">
                 <div class="form-group">
-                    <button class="btn btn-success">Search</button>
+                    <button class="btn btn-success btn-sm">Search</button>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="form-group pull-right">
-                    <a class="btn btn-success" href="{{ route('members.create') }}"> Create New Member</a>
+                    <a class="btn btn-success btn-sm" href="{{ route('members.create') }}"> Create New Member</a>
                 </div>
             </div>
         </div>
@@ -42,7 +44,7 @@
             <th>First name</th>
             <th>Surname</th>
             <th>Email</th>
-            <th width="280px">Action</th>
+            <th width="100px">Action</th>
         </tr>
     @foreach ($members as $member)
     <tr>
@@ -53,10 +55,41 @@
         <td>
             <!-- <a class="btn btn-primary" href="{{ route('members.edit',$member->id) }}">Edit</a> -->
             {!! Form::open(['method' => 'DELETE','route' => ['members.destroy', $member->id],'style'=>'display:inline']) !!}
-            {!! Form::submit('Delete', ['class' => 'btn btn-danger']) !!}
+            {!! Form::submit('Delete', ['class' => 'btn btn-danger btn-sm']) !!}
             {!! Form::close() !!}
         </td>
     </tr>
     @endforeach
     </table>
+    {{ $members->links() }}
+@endsection
+@section('scripts')
+<script type="text/javascript">
+        function edit_inline(obj,id,colum) {
+            var value = $(obj).text();
+             $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                url : 'members/'+id,
+                type : "PATCH",
+                dataType:"json",
+                data : {
+                    id: id,
+                    value:value,
+                    colum:colum
+                },
+                success : function (result){
+                    $(".message-update").css("background-color", "#dff0d8");
+                    $(".message-update").css('color', '#3c763d');
+                    $(".message-update").css('padding', '15px');
+                    if($.isEmptyObject(result.error)){
+                        $('.message-update').html(result.success);
+                    }else{
+                        $('.message-update').html(result.error);
+                    }
+                }
+            });
+        }
+    </script>
 @endsection

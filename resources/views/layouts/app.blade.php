@@ -6,11 +6,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    
 
     <!-- Styles -->
-    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 
-    <title>Laravel 5.5 CRUD Application</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+     <!-- <script src="{{ asset('js/app.js') }}"></script> -->
+    <!-- <link href="{{ asset('css/app.css') }}" rel="stylesheet"> -->
+    @yield('header')
+    
     
 </head>
 <body>
@@ -29,11 +36,14 @@
 
                     <!-- Branding Image -->
                     <a class="navbar-brand" href="{{ route('members.index') }}">
-                        {{ config('app.name', 'Laravel') }}
+                        {{ config('app.members') }}
                     </a>
+                @if ( Auth::check() and Auth::user()->role == 1 )
                     <a class="navbar-brand" href="{{ route('users.index') }}">
                         {{ config('app.dashboard') }}
-                    </a>
+                    </a> 
+                @endif
+                    
                 </div>
 
                 <div class="collapse navbar-collapse" id="app-navbar-collapse">
@@ -79,29 +89,6 @@
     <div class="container">
     @yield('content')
     </div>
-    <script src="{{ asset('js/app.js') }}"></script>
-    <script type="text/javascript">
-        function edit_inline(obj,id,colum) {
-            var val = $(obj).text();
-             $.ajax({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                url : 'members/'+id,
-                type : "PATCH",
-                dataType:"text",
-                data : {
-                     val:val,
-                     colum:colum
-                },
-                success : function (result){
-                    $(".message-update").css("background-color", "#dff0d8");
-                    $(".message-update").css('color', '#3c763d');
-                    $(".message-update").css('padding', '15px');
-                    $('.message-update').html(result);
-                }
-            });
-    }
-    </script>
+     @yield('scripts')
 </body>
 </html>
